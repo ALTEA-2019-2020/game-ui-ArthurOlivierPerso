@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface TrainerService {
     List<Trainer> listTrainers();
+    List<Trainer> listTrainersWithoutOne(String name);
     Trainer trainerByName(String name);
 }

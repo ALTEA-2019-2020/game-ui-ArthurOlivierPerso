@@ -9,6 +9,8 @@ public class Trainer {
 
     private List<PokemonType> pokemonTypes;
 
+    private String password;
+
     private List<Team> team;
 
     public String getName() {
@@ -17,6 +19,14 @@ public class Trainer {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public List<PokemonType> getPokemonTypes() {

@@ -4,6 +4,8 @@ import com.miage.altea.game_ui.pokemonTypes.bo.PokemonType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,14 +28,14 @@ public class PokemonTypeServiceImplTest {
         pikachu.setId(25);
 
         var expectedUrl = "http://localhost:8080/pokemon-types/";
-        when(restTemplate.getForObject(expectedUrl, PokemonType[].class)).thenReturn(new PokemonType[]{pikachu});
+        when(restTemplate.exchange(eq(expectedUrl), any(), any(), eq(PokemonType[].class))).thenReturn(new ResponseEntity(new PokemonType[]{pikachu}, HttpStatus.ACCEPTED));
 
         var pokemons = pokemonServiceImpl.listPokemonsTypes();
 
         assertNotNull(pokemons);
         assertEquals(1, pokemons.size());
 
-        verify(restTemplate).getForObject(expectedUrl, PokemonType[].class);
+        verify(restTemplate).exchange(eq(expectedUrl), any(), any(), eq(PokemonType[].class));
     }
 
     @Test

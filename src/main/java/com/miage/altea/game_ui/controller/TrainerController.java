@@ -8,15 +8,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.security.Principal;
+
 @Controller
 public class TrainerController {
     TrainerService trainerService;
 
     @GetMapping("/trainers")
-    public ModelAndView trainers(){
+    public ModelAndView trainers(Principal principal){
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("trainers");
-        modelAndView.addObject("trainers", trainerService.listTrainers());
+        modelAndView.addObject("trainers", trainerService.listTrainersWithoutOne(principal.getName()));
         return modelAndView;
     }
 
@@ -26,6 +28,15 @@ public class TrainerController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("trainer");
         modelAndView.addObject("trainer", trainerService.trainerByName(name));
+        return modelAndView;
+    }
+
+    @GetMapping("/profile")
+    public ModelAndView profile(Principal principal){
+        var modelAndView = new ModelAndView();
+        modelAndView.setViewName("trainer");
+        var trainer = trainerService.trainerByName(principal.getName());
+        modelAndView.addObject("trainer", trainer);
         return modelAndView;
     }
 

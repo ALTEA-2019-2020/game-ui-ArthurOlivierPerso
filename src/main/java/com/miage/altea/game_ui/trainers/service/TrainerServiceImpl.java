@@ -5,12 +5,15 @@ import com.miage.altea.game_ui.pokemonTypes.service.PokemonTypeService;
 import com.miage.altea.game_ui.trainers.bo.Team;
 import com.miage.altea.game_ui.trainers.bo.Trainer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class TrainerServiceImpl implements TrainerService {
@@ -23,8 +26,14 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public List<Trainer> listTrainers() {
         var trainers = template.getForObject(url+"/trainers/", Trainer[].class);
+        return List.of(Objects.requireNonNull(trainers));
+    }
 
-        return List.of(trainers);
+    @Override
+    public List<Trainer> listTrainersWithoutOne(String name) {
+        var trainers = template.getForObject(url+"/trainers/", Trainer[].class);
+        List<Trainer> trainerList = List.of(Objects.requireNonNull(trainers));
+        return trainerList.stream().filter(trainer -> !trainer.getName().equals(name)).collect(Collectors.toList());
     }
 
     @Override
@@ -32,7 +41,7 @@ public class TrainerServiceImpl implements TrainerService {
         Trainer trainer = template.getForObject(url+"/trainers/"+name, Trainer.class);
         List<PokemonType> pokemonTypes = pokemonTypeService.listPokemonsTypes();
 
-        for(Team team: trainer.getTeam()){
+        for(Team team: Objects.requireNonNull(trainer).getTeam()){
             List<PokemonType> list = (trainer.getPokemonTypes() == null) ? new ArrayList<>() : trainer.getPokemonTypes();
             PokemonType pokemonType = pokemonTypes.stream().filter(pType ->pType.getId()==team.getPokemonTypeId()).findFirst().get();
             pokemonType.setLevel(team.getLevel());
@@ -43,6 +52,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Autowired
+    @Qualifier("trainerApiRestTemplate")
     void setRestTemplate(RestTemplate restTemplate) {
         template = restTemplate;
     }
